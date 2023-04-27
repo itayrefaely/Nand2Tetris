@@ -1,0 +1,200 @@
+/** implements and handles everything regarding to the game board */
+
+class SnakeBoard {
+
+     // the game the snake is playing in
+    field SnakeGame game;
+
+    // the size of the board
+    field int sizeX, sizeY;
+
+    // the XY position of the snake's food 
+    field int foodX, foodY;
+    
+    // a two-dimensional array that represents the snake (it's location in the board)
+    field Array board;
+
+    // creates a new SnakeBoard
+    constructor SnakeBoard new(SnakeGame currGame, int x1, int y1) {
+        let game = currGame;
+        let sizeX = x1 / 4;
+        let sizeY = (y1-16) / 4;
+
+        do initBoard();
+        return this;
+    }
+
+    // disposes of a SnakeBoard
+    method void dispose() {
+        var int currX;
+        var Array xAxis;
+        let currX = 0;
+
+        while( currX < sizeX ) {
+            let xAxis = board[currX];
+            do xAxis.dispose();
+            let currX = currX + 1;
+        }
+
+        do Memory.deAlloc(this);
+        return;
+    }
+
+    // selects a position for the food
+    method void locFood() {
+        var boolean found;
+        var int randX, randY;
+        let found = false;
+
+        // don't place the food on top of a snake piece
+        while( ~found ) {
+            let randX = Random.randRange(sizeX);
+            let randY = Random.randRange(sizeY-4);
+            if( ~ ifOccupied(randX, randY) ) {
+                let found = true;
+            }
+        }
+
+        let foodX = randX;
+        let foodY = randY;
+        return;
+    }
+
+    // draws the food according to the location allocated by placeFood()
+    method void drawFood() {
+        do Screen.setColor(true);
+        do Screen.drawCircle((foodX*4)+2, (foodY*4)+2, 2);
+        return;
+    }
+   
+    // initializes the board
+    method void initBoard() {
+        var int currX, currY;
+        var Array xAxis;
+
+        let board = Array.new(sizeX);
+        let currX = 0;
+
+        while( currX < sizeX ) {
+            let xAxis = Array.new(sizeY);
+            let currY = 0;
+
+            while( currY < sizeY ) {
+                let xAxis[currY] = false;
+                let currY = currY + 1;
+            }
+
+            let board[currX] = xAxis;
+            let currX = currX + 1;
+        }
+
+        return;
+    }
+
+    /**
+    Getters
+    */
+    method int sizeX() {
+        return sizeX;
+    }
+    method int sizeY() {
+        return sizeY;
+    }
+    method int foodX() {
+        return foodX;
+    }
+    method int foodY() {
+        return foodY;
+    }
+
+    /**
+    Board access methods
+    */
+    method void setOccupied(int x, int y, boolean occupied) {
+        var Array xAxis;
+        let xAxis = board[x];
+        let xAxis[y] = occupied;
+        return;
+    }
+    method boolean ifOccupied(int x, int y) {
+        var Array xAxis;
+        let xAxis = board[x];
+        if( xAxis[y] ) {
+            return true;
+        }
+        else {
+            return false;
+        }
+    }
+    method boolean checkFood(int x, int y) {
+        if( x = foodX ) {
+            if( y = foodY ) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    // draws a block and marks that block as occupied
+    method void drawSnakeBit(int x, int y) {
+        do Screen.setColor(true);
+        do Screen.drawRectangle( x*4, y*4, (x*4)+4, (y*4)+4 );
+        do setOccupied(x, y, true);
+        return;
+    }
+
+    // clears a block and marks that block as not occupied
+    method void clearSnakeBit(int x, int y) {
+        do Screen.setColor(false);
+        do Screen.drawRectangle( x*4, y*4, (x*4)+4, (y*4)+4 );
+        do setOccupied(x, y, false);
+        return;
+    }
+ 
+    /**
+    * draws the status line
+    * Level: 0___  Score: 0_______  Length: 0___
+    * 0            25               52 
+    */
+    method void drawStatus() {
+
+        var Snake snake;
+        var String tString;
+
+        do Output.moveCursor(22, 0);
+        let tString = "Level: ";
+        do Output.printString(tString);
+        do tString.dispose();
+        do Output.printInt(game.getLevel());
+        do Output.moveCursor(22, 25);
+        let tString = "Score: ";
+        do Output.printString(tString);
+        do tString.dispose();
+        do Output.printInt(game.getScore());
+        do Output.moveCursor(22, 52);
+        let tString = "Length: ";
+        do Output.printString(tString);
+        do tString.dispose();
+        let snake = game.getSnake();
+        do Output.printInt(snake.getLength());
+
+        return;
+
+    }
+
+    // draws endgame command
+    method void drawCrashed() {
+
+        var String tString;
+
+        do Output.moveCursor(22, 12);
+        let tString = "*CRASHED*";
+        do Output.printString(tString);
+        do tString.dispose();
+
+        return;
+
+    }
+
+
+}
