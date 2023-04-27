@@ -1,6 +1,7 @@
 # Nand2Tetris
 Implementation of a complete computer from Nand gates on up as described in the book,
 "The Elements of Computing Systems" by Nisan and Schocken.
+
 Nand2Tetris website: http://nand2tetris.org/
 
 Project 1: Boolean Logic
